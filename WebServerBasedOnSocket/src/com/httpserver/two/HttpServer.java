@@ -2,7 +2,6 @@ package com.httpserver.two;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.stream.Stream;
 
 public class HttpServer extends Thread{
 
@@ -36,7 +35,8 @@ public class HttpServer extends Thread{
 
     @Override
     public void run(){
-        String filePath = read();
+        String filePath = null;
+        filePath = read();
         response(filePath);
     }
 
@@ -45,7 +45,23 @@ public class HttpServer extends Thread{
      * @example GET /index.html HTTP/1.1
      * @return
      */
-    private String read() {
+    private String read(){
+        // 测试GET /index.html与GET /favicon.ico是否是为两个socket请求
+        System.out.println("CurrentThreadId："+Thread.currentThread().getName());
+        /*
+        // 一样会阻塞！！！
+        InputStream inputStream = input;
+        byte[] buff = new byte[1024];
+        StringBuilder sb = new StringBuilder();
+        while (inputStream.read(buff)!=-1){
+            sb.append(new String(buff));
+        }
+        String request = sb.toString();
+        System.out.println(request);
+        String[] lines = request.split("\r\n");
+        String[] splits = lines[0].split(" ");
+        */
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         try {
             String line = reader.readLine();
@@ -53,7 +69,7 @@ public class HttpServer extends Thread{
             if (splits.length!=3){
                 return null;
             }
-            System.out.println(line);
+            System.out.println("Request Header: "+line);
 
             // 看下输入流有哪些内容
             /*
@@ -64,7 +80,14 @@ public class HttpServer extends Thread{
             }
             */
 
+            do{
+                if((line=reader.readLine())!=null){
+                    System.out.println(line);
+                }
+            } while(reader.ready()); //当缓冲区不为空，ready()返回true
+
             // 返回路径
+            System.out.println("返回路径："+splits[1]);
             return splits[1];
         } catch (IOException e) {
             e.printStackTrace();
