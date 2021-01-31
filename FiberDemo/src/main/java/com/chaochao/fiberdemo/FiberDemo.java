@@ -47,6 +47,8 @@ public class FiberDemo {
 
         for (int i = 0; i < FiberNumber; i++) {
             new Fiber(() -> {
+                // ForkJoinPool-default-fiber-pool-worker-[num]
+                System.out.println("当前线程ID: " + Thread.currentThread().getName());
                 counter.incrementAndGet();
                 if (counter.get() == FiberNumber) {
                     System.out.println("done");
